@@ -37,7 +37,7 @@ my $connect = DBI->connect($DBI, $mysql_user, $mysql_pass, {
                                                         PrintError => 0,
                     	                                   mysql_enable_utf8 => 1}) or die ("Cant connect to MySQL serever 21!!!");
 
-open(LOOP,"<$file");
+open(LOOP,"<$idfile[1]");
 	my @id = <LOOP>;
 close(LOOP);
 
