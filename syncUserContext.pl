@@ -43,11 +43,17 @@ while(my $name = $sth->fetchrow_hashref()) {
 					print "Get settings for user: $name->{username} id in 46: $ext_id\n";
 					foreach my $line (@all_user_settings) {
 					print "Found setting: $line\n";
-					print "params:\n";
 						my @settings_params = &get_user_setting($line,1);
 							foreach my $params (@settings_params) {	
 								my @par = split(/\;/, $params);
-								print "name: $par[1]\n user_id: $ext_id\n values: $par[3]\n";
+								print "Migrate user setting for user $name->{username}\n";
+								$connect2->do("insert into user_settings (version,
+																			name,
+																			user_id,
+																			user_value) values (0,
+																								'$par[1]',
+																								'$ext_id',
+																								'$par[3]')");
 							}
 					}
 				}
