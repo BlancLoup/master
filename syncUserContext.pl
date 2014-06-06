@@ -74,10 +74,10 @@ sub get_user_setting {
 	my $line;
 	my $sth2;
 	if ($db == 1) {
-		$sth2 = $connect->prepare("select * from user_settings where id = '$id'");
+		$sth2 = $connect->prepare("select * from user_settings where id = '$id' and name = 'advanced-presets'");
 	}
 	elsif ($db == 2) {
-		$sth2 = $connect2->prepare("select * from user_settings where user_id = '$id'");
+		$sth2 = $connect2->prepare("select * from user_settings where user_id = '$id' and name = 'advanced-presets'");
 	}
 	$sth2->execute();
 	while ($line = $sth2->fetchrow_hashref()) {
@@ -95,10 +95,10 @@ sub get_all_user_settings {
     my @result;
     my $sth3;
         if ($db == 1) {
-              $sth3 = $connect->prepare("select id from user_settings where user_id = '$user_id'");
+              $sth3 = $connect->prepare("select id from user_settings where user_id = '$user_id' and name = 'advanced-presets'");
         }
         elsif ($db == 2) {
-              $sth3 = $connect2->prepare("select id from user_settings where user_id = '$user_id'");
+              $sth3 = $connect2->prepare("select id from user_settings where user_id = '$user_id' and name = 'advanced-presets'");
         }
         if ($sth3) {
         $sth3->execute();
