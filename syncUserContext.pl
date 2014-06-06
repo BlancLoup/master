@@ -37,21 +37,24 @@ $sth->execute();
 while(my $name = $sth->fetchrow_hashref()) {
 	my @all_user_settings = &get_all_user_settings($name->{id},1);
 	my $ext_id = &get_user_id($name->{username});
-		if ($all_user_settings[0]) {
-			print "Get settings for user: $name->{username} id in 46: $ext_id\n";
-		}
-		foreach my $line (@all_user_settings) {
-			print "Found setting: $line\n";
-			print "params:\n";
-				my @settings_params = &get_user_setting($line,1);
-					foreach my $params (@settings_params) {
-						print "$params\n";
+		if (($all_user_settings[0]) && ($ext_id ne "NOT_FOUND")) {
+			my @usrset46 = &get_all_user_settings($ext_id,2);
+				unless ($usrset46[0]){
+					print "Get settings for user: $name->{username} id in 46: $ext_id\n";
+					foreach my $line (@all_user_settings) {
+					print "Found setting: $line\n";
+					print "params:\n";
+						my @settings_params = &get_user_setting($line,1);
+							foreach my $params (@settings_params) {	
+								my @par = split(/\;/, $params);
+								print "name: $par[1]\n user_id: $ext_id\n values: $par[3]\n";
+							}
 					}
+				}
 		}
 }
 
 $sth->finish();
-# $sth2->finish();
 
 $connect->disconnect;
 $connect2->disconnect;
@@ -59,21 +62,21 @@ $connect2->disconnect;
 exit 0;	
 
 sub get_user_setting {
-	my $setting_id = $_[0];
+	my $id = $_[0];
 	my $db = $_[1];
 	my @result;
 	my $line;
 	my $sth2;
 	if ($db == 1) {
-		$sth2 = $connect->prepare("select * from user_settings where id = '$setting_id'");
+		$sth2 = $connect->prepare("select * from user_settings where id = '$id'");
 	}
 	elsif ($db == 2) {
-		$sth2 = $connect2->prepare("select * from user_settings where id = '$setting_id'");
+		$sth2 = $connect2->prepare("select * from user_settings where user_id = '$id'");
 	}
 	$sth2->execute();
 	while ($line = $sth2->fetchrow_hashref()) {
 		if ($line->{id}){
-			push (@result, "$line->{id}:$line->{name}");
+			push (@result, "$line->{id};$line->{name};$line->{user_id};$line->{user_value}");
 		}
 	}
 	return @result;
@@ -112,7 +115,7 @@ sub get_user_id {
 			return $result;
 		}
 		else {
-			return "ERROR\n";
+			return "NOT_FOUND";
 		}
 	$sth4->finish();	
 }
