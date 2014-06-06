@@ -36,23 +36,24 @@ $sth->execute();
 
 while(my $name = $sth->fetchrow_hashref()) {
 	my @all_user_settings = &get_all_user_settings($name->{id},1);
+	my $ext_id = &get_user_id($name->{username});
 		if ($all_user_settings[0]) {
-			print "Get settings for user: $name->{username}\n";
+			print "Get settings for user: $name->{username} id in 46: $ext_id\n";
 		}
 		foreach my $line (@all_user_settings) {
 			print "Found setting: $line\n";
-#			print "params:\n";
-#				my @settings_params = &get_user_setting($line,1);
-#					foreach my $params (@settings_params) {
-#						print "$params\n";
-#					}
+			print "params:\n";
+				my @settings_params = &get_user_setting($line,1);
+					foreach my $params (@settings_params) {
+						print "$params\n";
+					}
 		}
 }
 
 $sth->finish();
 # $sth2->finish();
 
-$connect2->disconnect;
+$connect->disconnect;
 $connect2->disconnect;
 
 exit 0;	
@@ -64,17 +65,17 @@ sub get_user_setting {
 	my $line;
 	my $sth2;
 	if ($db == 1) {
-		my $sth2 = $connect->prepare("select * from user_settings where id = '$setting_id'");
+		$sth2 = $connect->prepare("select * from user_settings where id = '$setting_id'");
 	}
 	elsif ($db == 2) {
-		my $sth2 = $connect2->prepare("select * from user_settings where id = '$setting_id'");
+		$sth2 = $connect2->prepare("select * from user_settings where id = '$setting_id'");
 	}
 	$sth2->execute();
-#	while ($line = $sth->fetchrow_hashref()) {
-#		if ($line->{id}){
-#			push (@result, "$line->{id}:$line->{name}");
-#		}
-#	}
+	while ($line = $sth2->fetchrow_hashref()) {
+		if ($line->{id}){
+			push (@result, "$line->{id}:$line->{name}");
+		}
+	}
 	return @result;
 	$sth2->finish();
 }
@@ -99,4 +100,19 @@ sub get_all_user_settings {
         $sth3->finish();
         }
         else {return "ERROR\n";}
+}
+
+sub get_user_id {
+	my $username = $_[0];
+	my $sth4;
+	my $result;
+		$sth4 = $connect2->prepare("select id from abstract_user where username = '$username'");
+		$sth4->execute();
+		if ($result = $sth4->fetchrow_array()){
+			return $result;
+		}
+		else {
+			return "ERROR\n";
+		}
+	$sth4->finish();	
 }
