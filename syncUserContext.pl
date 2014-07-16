@@ -46,7 +46,7 @@ while(my $name = $sth->fetchrow_hashref()) {
 						my @settings_params = &get_user_setting($line,1);
 							foreach my $params (@settings_params) {	
 								my @par = split(/\;/, $params);
-								print "Migrate user setting for user $name->{username}\n";
+								print "Migrate user setting for user $name->{username} param $par[3]\n";
 								$connect2->do("insert into user_settings (version,
 																			name,
 																			user_id,
